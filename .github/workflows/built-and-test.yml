@@ -90,7 +90,7 @@ jobs:
           # SSH key file name (default: id_rsa)
           name: duckie-github
           # public keys of SSH servers
-          known_hosts: $ {{ secrets.KNOWN_HOST }}
+          known_hosts: ${{ secrets.KNOWN_HOST }}
           # replace / ignore / fail
           if_key_exists: replace
       - name: Deploy Docker image
