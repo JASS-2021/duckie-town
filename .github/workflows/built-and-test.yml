@@ -1,0 +1,76 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - trunk
+  pull_request:
+    branches:
+      - trunk
+
+env:
+  IMAGE_NAME: jass-duckie-town-webservice
+
+jobs:
+  testing:
+    name: Linux focal ${{ matrix.configuration }} test build
+    container:
+      image: swift:focal
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        configuration: [debug] #, release
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install libsqlite3
+      run: apt-get update && apt-get install -y --no-install-recommends libsqlite3-dev
+    - uses: actions/cache@v2
+      with:
+        path: .build
+        key: ${{ runner.os }}-focal-spm-cache-${{ hashFiles('Package.resolved') }}
+    
+    - name: Check Swift version
+      run: swift --version
+    
+    # create docker image
+    # push to DockerHub
+    # use vpn to get onto TUM network
+    # ssh into the RPi
+    # upload any updated image
+
+    - name: Build & Test
+      if: matrix.configuration == 'debug'
+      run: swift test --configuration ${{ matrix.configuration }} --enable-test-discovery
+
+
+  # NEW JOB TO RUN after 'testing'
+  push_to_registry:
+    needs: [testing]
+    name: Push Docker image to GitHub Packages
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Build image
+        run: | 
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [ "$VERSION" == "trunk" ] && docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+      - name: Log into registry
+        # This is where you will update the PATH to GITHUB_TOKEN
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "trunk" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
