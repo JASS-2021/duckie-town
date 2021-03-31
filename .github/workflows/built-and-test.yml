@@ -48,7 +48,7 @@ jobs:
     needs: []#[testing]
     name: Push Docker image to GitHub Packages
     env:      
-      DOCKER_TARGET_PLATFORM: linux/arm64v8
+      DOCKER_TARGET_PLATFORM: linux/arm64/v8
 
     runs-on: ubuntu-latest
     steps:
@@ -57,7 +57,7 @@ jobs:
       - name: Build image
         run: | 
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [ "$VERSION" == "trunk" ] && docker buildx build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" 
+          [ "$VERSION" == "trunk" ] && docker buildx build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" --platform $DOCKER_TARGET_PLATFORM 
       - name: Log into registry
         # This is where you will update the PATH to GITHUB_TOKEN
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
