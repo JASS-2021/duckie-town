@@ -74,3 +74,25 @@ jobs:
           echo VERSION=$VERSION
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+          
+  # DEPLOY
+  deploy_to_raspberry:
+    needs: [push_to_registry]
+    name: Deploy Docker image to the Raspberry
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2.3.0
+        with:
+          # SSH private key
+          key: ${{ secrets.SSH_KEY }}
+          # SSH key file name (default: id_rsa)
+          name: duckie-github
+          # public keys of SSH servers
+          known_hosts: $ {{ secrets.KNOWN_HOST }}
+          # replace / ignore / fail
+          if_key_exists: replace
+      - name: Deploy Docker image
+        run: ssh -p 10010 ubuntu:131.159.38.52 'cd ~/duckie-town && echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin && docker pull ghcr.io/jass-2021/jass-duckie-town-webservice:latest && docker run -d -p 8080:8080 jass-duckie-town-webservice'
+
