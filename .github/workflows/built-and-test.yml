@@ -57,10 +57,7 @@ jobs:
       - name: Install docker
         run: |
           ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-          brew update
-          brew cleanup
-          brew cask cleanup
-          brew cask install docker
+          brew install docker
       - name: Build image
         run: | 
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
