@@ -13,7 +13,6 @@ struct DuckieTownWeb: WebService {
     var configuration: Configuration {
         ExporterConfiguration()
             .exporter(RESTInterfaceExporter.self)
-            .exporter(OpenAPIInterfaceExporter.self)
     }
 
     var content: some Component {
