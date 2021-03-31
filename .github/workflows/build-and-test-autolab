@@ -1,0 +1,101 @@
+name: Build and Test Autolab
+
+on:
+  push:
+    branches:
+      - trunk
+  pull_request:
+    branches:
+      - trunk
+
+env:
+  IMAGE_NAME: jass-duckie-town-webservice-autolab
+
+jobs:
+  testing:
+    name: Linux focal ${{ matrix.configuration }} test build
+    container:
+      image: swift:focal
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        configuration: [debug] #, release
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install libsqlite3
+      run: apt-get update && apt-get install -y --no-install-recommends libsqlite3-dev
+    - uses: actions/cache@v2
+      with:
+        path: .build
+        key: ${{ runner.os }}-focal-spm-cache-${{ hashFiles('Package.resolved') }}
+    
+    - name: Check Swift version
+      run: swift --version
+    
+    # create docker image
+    # push to DockerHub
+    # use vpn to get onto TUM network
+    # ssh into the RPi
+    # upload any updated image
+
+    - name: Build & Test
+      if: matrix.configuration == 'debug'
+      run: swift test --configuration ${{ matrix.configuration }} --enable-test-discovery
+
+
+  # NEW JOB TO RUN after 'testing'
+  push_to_registry:
+    needs: [testing]
+    name: Push Docker image to GitHub Packages
+
+    runs-on: self-hosted
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Build image
+        run: | 
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [ "$VERSION" == "trunk" ] && docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+      - name: Log into registry
+        # This is where you will update the PATH to GITHUB_TOKEN
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "trunk" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+          
+  # DEPLOY
+  deploy_to_autolab:
+    needs: [push_to_registry]
+    name: Deploy Docker image to autolab
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy with SSH
+        uses: fifsky/ssh-action@v0.0.5
+        with:
+          # Command to execute on the remote server.
+          command: |
+            cd ~/duckie-town 
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin 
+            docker pull ghcr.io/jass-2021/jass-duckie-town-webservice-autolab:latest
+            docker run -d -p 8080:8080 ghcr.io/jass-2021/jass-duckie-town-webservice-autolab:latest
+          # Hostname or IP address of the server.
+          host: 10.135.4.180
+          # Username for authentication.
+          user: jass
+          # Port number of the server.
+          port: 56972
+          # String that contains a private key for either key-based or hostbased user authentication (OpenSSH format)
+          key: ${{ secrets.SSH_KEY }}
