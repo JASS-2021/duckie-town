@@ -50,14 +50,10 @@ jobs:
     env:      
       DOCKER_TARGET_PLATFORM: linux/arm64/v8
 
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-      - name: Install docker
-        run: |
-          ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-          brew install docker
       - name: Build image
         run: | 
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
