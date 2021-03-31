@@ -39,8 +39,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends libsqlite3-dev
 
 # Copy over the generated Package.*, and resolve if changed.
 COPY Package.* ./
-RUN swift package resolve
-
 # The usual copying over
 COPY Sources ./Sources
 COPY Tests ./Tests
