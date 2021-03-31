@@ -21,7 +21,12 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "DuckieTown",
-            dependencies: ["Apodini"]),
+            dependencies: [
+                .product(name: "Apodini", package: "Apodini"),
+                .product(name: "ApodiniJobs", package: "Apodini"),
+                .product(name: "ApodiniREST", package: "Apodini"),
+                .product(name: "ApodiniOpenAPI", package: "Apodini")
+            ]),
         .testTarget(
             name: "DuckieTownTests",
             dependencies: ["DuckieTown"]),
