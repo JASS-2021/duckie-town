@@ -12,43 +12,43 @@ env:
   IMAGE_NAME: jass-duckie-town-webservice
 
 jobs:
-  testing:
-    name: Linux focal ${{ matrix.configuration }} test build
-    container:
-      image: swift:focal
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        configuration: [debug] #, release
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install libsqlite3
-      run: apt-get update && apt-get install -y --no-install-recommends libsqlite3-dev
-    - uses: actions/cache@v2
-      with:
-        path: .build
-        key: ${{ runner.os }}-focal-spm-cache-${{ hashFiles('Package.resolved') }}
-    
-    - name: Check Swift version
-      run: swift --version
-    
-    # create docker image
-    # push to DockerHub
-    # use vpn to get onto TUM network
-    # ssh into the RPi
-    # upload any updated image
-
-    - name: Build & Test
-      if: matrix.configuration == 'debug'
-      run: swift test --configuration ${{ matrix.configuration }} --enable-test-discovery
+  #testing:
+  #  name: Linux focal ${{ matrix.configuration }} test build
+  #  container:
+  #    image: swift:focal
+  #  runs-on: ubuntu-latest
+  #  strategy:
+  #    matrix:
+  #      configuration: [debug] #, release
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #  - name: Install libsqlite3
+  #    run: apt-get update && apt-get install -y --no-install-recommends libsqlite3-dev
+  #  - uses: actions/cache@v2
+  #    with:
+  #      path: .build
+  #      key: ${{ runner.os }}-focal-spm-cache-${{ hashFiles('Package.resolved') }}
+  #  
+  #  - name: Check Swift version
+  #    run: swift --version
+  #  
+  #  # create docker image
+  #  # push to DockerHub
+  #  # use vpn to get onto TUM network
+  #  # ssh into the RPi
+  #  # upload any updated image
+  #
+  #  - name: Build & Test
+  #    if: matrix.configuration == 'debug'
+  #    run: swift test --configuration ${{ matrix.configuration }} --enable-test-discovery
 
 
   # NEW JOB TO RUN after 'testing'
   push_to_registry:
-    needs: [testing]
+    needs: []#[testing]
     name: Push Docker image to GitHub Packages
     env:      
-      DOCKER_TARGET_PLATFORM: linux/arm64/v8
+      DOCKER_TARGET_PLATFORM: linux/arm64v8
 
     runs-on: ubuntu-latest
     steps:
