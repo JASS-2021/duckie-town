@@ -97,6 +97,9 @@ jobs:
           USER_KEY: ${{ secrets.USER_KEY }}
       - name: Check Connect VPN
         run: echo ${{ steps.connect_vpn.outputs.STATUS }}
+        
+      - name: install avahi-utils
+        run:  sudo apt install avahi-utils
           
       - name: Deploy with SSH
         uses: fifsky/ssh-action@v0.0.5
