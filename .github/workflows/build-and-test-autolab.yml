@@ -82,9 +82,6 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-     connect-open-vpn:
-    runs-on: ubuntu-latest
-    steps:
       - uses: actions/checkout@v1
       - name: Install Open VPN
         run: sudo apt-get install openvpn
