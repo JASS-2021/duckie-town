@@ -97,9 +97,6 @@ jobs:
           USER_KEY: ${{ secrets.USER_KEY }}
       - name: Check Connect VPN
         run: echo ${{ steps.connect_vpn.outputs.STATUS }}
-      - name: kill vpn
-        if: always()
-        run: sudo killall openvpn
           
       - name: Deploy with SSH
         uses: fifsky/ssh-action@v0.0.5
