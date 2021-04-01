@@ -16,4 +16,4 @@ RUN swift build
 # Exposes ports for Docker container
 EXPOSE 8080
 
-CMD swift run
+CMD swift run --skip-build --skip-update
