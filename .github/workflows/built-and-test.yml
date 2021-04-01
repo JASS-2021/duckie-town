@@ -64,13 +64,12 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@master
         
-      - name: Cache Docker layers
-        uses: actions/cache@v2
+      - uses: actions/cache@v2
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          path: .build
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-spm-
         
       - name: Build
         uses: docker/build-push-action@v2
@@ -83,8 +82,12 @@ jobs:
           tags: jass-duckie-town-webservice
           labels: "runnumber=${GITHUB_RUN_ID}"
           load: true
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
+          cache-from: type=local,src=.build
+          cache-to: type=local,dest=.build-new
+      - name: Move cache
+        run: |
+          rm -rf .build
+          mv .build-new .build
         
       #- name: Build image
       #  run: | 
