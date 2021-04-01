@@ -101,7 +101,7 @@ jobs:
           
   # DEPLOY
   deploy_to_raspberry:
-    needs: []#[push_to_registry]
+    needs: [push_to_registry]
     name: Deploy Docker image to the Raspberry
 
     runs-on: ubuntu-latest
