@@ -82,14 +82,27 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-     - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install OpenVPN
-        run: sudo apt install -y openvpn openvpn-systemd-resolved
-      - name: Connect to VPN
-        uses: "kota65535/github-openvpn-connect-action@v1"
+     connect-open-vpn:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install Open VPN
+        run: sudo apt-get install openvpn
+      - name: Connect VPN
+        uses: hanyaElhashemy/action-connect-ovpn@master
+        id: connect_vpn
         with:
-          config_file: ./github/workflows/jass-spb.ovpn
+          PING_URL: '127.0.0.1'
+          FILE_OVPN: '.github/workflows/jass-spb.ovpn'
+        env:
+          CA_CRT: ${{ secrets.CA_CRT}}
+          USER_CRT: ${{ secrets.USER_CRT }}
+          USER_KEY: ${{ secrets.USER_KEY }}
+      - name: Check Connect VPN
+        run: echo ${{ steps.connect_vpn.outputs.STATUS }}
+      - name: kill vpn
+        if: always()
+        run: sudo killall openvpn
           
       - name: Deploy with SSH
         uses: fifsky/ssh-action@v0.0.5
