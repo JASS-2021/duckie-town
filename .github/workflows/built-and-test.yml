@@ -16,7 +16,7 @@ jobs:
     name: Linux focal ${{ matrix.configuration }} test build
     container:
       image: swift:focal
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
         configuration: [debug] #, release
@@ -50,7 +50,7 @@ jobs:
     env:      
       DOCKER_TARGET_PLATFORM: linux/arm64/v8
   
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -104,7 +104,7 @@ jobs:
     needs: [push_to_registry]
     name: Deploy Docker image to the Raspberry
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Deploy with SSH
         uses: fifsky/ssh-action@v0.0.5
