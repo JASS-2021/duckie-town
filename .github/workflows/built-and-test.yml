@@ -70,9 +70,9 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: ./Dockerfile
-          platforms: $DOCKER_TARGET_PLATFORM
+          platforms: linux/arm64/v8
           push: true
-          tags: $IMAGE_NAME
+          tags: jass-duckie-town-webservice
           labels: "runnumber=${GITHUB_RUN_ID}"
           load: true
         
