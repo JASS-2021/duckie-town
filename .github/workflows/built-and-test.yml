@@ -44,47 +44,47 @@ jobs:
 
 
   # NEW JOB TO RUN after 'testing'
-  push_to_registry:
-    needs: []#[testing]
-    name: Push Docker image to GitHub Packages
-    env:      
-      DOCKER_TARGET_PLATFORM: linux/arm64/v8
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
-      - name: Setup Docker
-        run: |
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-          docker buildx create --use
-          docker buildx inspect --bootstrap
-      - name: Build image
-        run: | 
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [ "$VERSION" == "trunk" ] && docker buildx build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" --platform $DOCKER_TARGET_PLATFORM --load 
-      - name: Log into registry
-        # This is where you will update the PATH to GITHUB_TOKEN
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      - name: Push image
-        run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "trunk" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+  #push_to_registry:
+  #  needs: []#[testing]
+  #  name: Push Docker image to GitHub Packages
+  #  env:      
+  #    DOCKER_TARGET_PLATFORM: linux/arm64/v8
+  #
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - name: Check out the repo
+  #      uses: actions/checkout@v2
+  #    - name: Setup Docker
+  #      run: |
+  #        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  #        docker buildx create --use
+  #        docker buildx inspect --bootstrap
+  #    - name: Build image
+  #      run: | 
+  #        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+  #        [ "$VERSION" == "trunk" ] && docker buildx build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" --platform $DOCKER_TARGET_PLATFORM --load 
+  #    - name: Log into registry
+  #      # This is where you will update the PATH to GITHUB_TOKEN
+  #      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+  #    - name: Push image
+  #      run: |
+  #        IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+  #        # Change all uppercase to lowercase
+  #        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+  #        # Strip git ref prefix from version
+  #        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+  #        # Strip "v" prefix from tag name
+  #        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+  #        # Use Docker `latest` tag convention
+  #        [ "$VERSION" == "trunk" ] && VERSION=latest
+  #        echo IMAGE_ID=$IMAGE_ID
+  #        echo VERSION=$VERSION
+  #        docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+  #        docker push $IMAGE_ID:$VERSION
           
   # DEPLOY
   deploy_to_raspberry:
-    needs: [push_to_registry]
+    needs: []#[push_to_registry]
     name: Deploy Docker image to the Raspberry
 
     runs-on: ubuntu-latest
