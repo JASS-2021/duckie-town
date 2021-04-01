@@ -17,7 +17,7 @@ jobs:
     needs: []
     name: Push Docker image to GitHub Packages
   
-    runs-on: ubuntu-latest
+    runs-on: temp
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -66,7 +66,7 @@ jobs:
     needs: [push_to_registry]
     name: Deploy Docker image to the Raspberry
 
-    runs-on: ubuntu-latest
+    runs-on: temp
     steps:
       - name: Deploy with SSH
         uses: fifsky/ssh-action@v0.0.5
