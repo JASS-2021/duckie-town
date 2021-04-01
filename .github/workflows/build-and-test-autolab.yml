@@ -86,7 +86,7 @@ jobs:
       - name: Install Open VPN
         run: sudo apt-get install openvpn
       - name: Connect VPN
-        uses: hanyaElhashemy/action-connect-ovpn@master
+        uses: golfzaptw/action-connect-ovpn@master
         id: connect_vpn
         with:
           PING_URL: '127.0.0.1'
