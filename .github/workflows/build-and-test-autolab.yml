@@ -38,9 +38,9 @@ jobs:
     # ssh into the RPi
     # upload any updated image
 
-  ##  - name: Build & Test
-  ##    if: matrix.configuration == 'debug'
-  ##   run: swift test --configuration ${{ matrix.configuration }} --enable-test-discovery
+    - name: Build & Test
+      if: matrix.configuration == 'debug'
+      run: swift test --configuration ${{ matrix.configuration }} --enable-test-discovery
 
 
   # NEW JOB TO RUN after 'testing'
