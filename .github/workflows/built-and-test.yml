@@ -71,7 +71,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/arm64/v8
-          push: true
+          push: false
           tags: jass-duckie-town-webservice
           labels: "runnumber=${GITHUB_RUN_ID}"
           load: true
