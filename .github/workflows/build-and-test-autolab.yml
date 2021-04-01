@@ -48,7 +48,7 @@ jobs:
     needs: [testing]
     name: Push Docker image to GitHub Packages
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
