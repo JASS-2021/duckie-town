@@ -12,7 +12,7 @@ COPY Tests ./Tests
 RUN swift package resolve
 
 # Build the application
-RUN swift build
+RUN swift build --configuration release
 
 # Exposes ports for Docker container
 EXPOSE 8080
