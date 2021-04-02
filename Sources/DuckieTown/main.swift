@@ -1,5 +1,7 @@
 import Apodini
 import ApodiniREST
+import ApodiniOpenAPI
+
 
 struct Greeter: Handler {
     @Parameter var country: String?
@@ -13,11 +15,18 @@ struct DuckieTownWeb: WebService {
     var configuration: Configuration {
         ExporterConfiguration()
             .exporter(RESTInterfaceExporter.self)
+            .exporter(OpenAPIInterfaceExporter.self)
     }
 
     var content: some Component {
         Greeter()
+        Group("instruction") {
+            DuckiebotInstructionHandler()
+                .operation(.read)
+        }
     }
 }
+
+var duckiebot: DuckieBot = DuckieBot(id: 0, intersectionId: 0, atDirection: .south)
 
 try DuckieTownWeb.main()
