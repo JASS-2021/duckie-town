@@ -73,6 +73,10 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm
+      - name: List
+        run: |
+          ls -al
+          ls -al .build
         
       - name: Build
         uses: docker/build-push-action@v2
