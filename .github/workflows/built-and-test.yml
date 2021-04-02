@@ -52,7 +52,7 @@ jobs:
   
     strategy:
       matrix:
-        arch: ['linux/arm64/v8']#, 'linux/amd64']
+        arch: ['linux/arm64/v8', 'linux/amd64']
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -69,10 +69,10 @@ jobs:
         
       - uses: actions/cache@v2
         with:
-          path: .build
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-${{ matrix.arch }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-spm
+            ${{ runner.os }}-${{ matrix.arch }}-spm
       - name: List1
         run: |
           ls -al
@@ -87,24 +87,14 @@ jobs:
           platforms: ${{ matrix.arch }}
           push: false
           tags: jass-duckie-town-webservice
-          labels: "runnumber=${GITHUB_RUN_ID}"
+          labels: "runnumber=${GITHUB_RUN_ID}", "arch=${{ matrix.arch }}"
           load: true
-          cache-from: type=local,src=.build
-          cache-to: type=local,dest=.build-new
-      - name: List2
-        run: |
-          ls -al
-          ls -al .build
-          ls -al .build-new
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
       - name: Move cache
         run: |
-          rm -rf .build
-          mv .build-new .build
-          ls -al .build
-      - name: List3
-        run: |
-          ls -al
-          ls -al .build
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
           
       - name: Log into registry
         # This is where you will update the PATH to GITHUB_TOKEN
