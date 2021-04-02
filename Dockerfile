@@ -12,10 +12,10 @@ COPY Tests ./Tests
 COPY Sources ./Sources
 
 # Build the application
-RUN swift build --configuration release
+RUN swift build --configuration debug
 
 # Exposes ports for Docker container
 EXPOSE 8080
 
 # Start the application (Preventing rebuilds)
-CMD swift run --skip-build --skip-update --configuration release
+CMD swift run --skip-build --skip-update --configuration debug
