@@ -52,7 +52,7 @@ jobs:
   
     strategy:
       matrix:
-        arch: ['linux/arm64/v8', 'linux/amd64']
+        arch: ['linux/arm64/v8']#, 'linux/amd64']
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -70,9 +70,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: .build
-          key: ${{ runner.os }}-${{ matrix.arch }}-spm-${{ hashFiles('**/Package.resolved') }}
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.arch }}-spm
+            ${{ runner.os }}-spm
         
       - name: Build
         uses: docker/build-push-action@v2
