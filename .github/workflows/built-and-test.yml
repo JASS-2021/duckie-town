@@ -144,7 +144,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           
   deploy_to_autolab:
-    needs: [push_to_registry]
+    needs: [buildx]
     name: Deploy Docker image to autolab
 
     runs-on: ubuntu-latest
