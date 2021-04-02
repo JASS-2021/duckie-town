@@ -73,7 +73,7 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm
-      - name: List
+      - name: List1
         run: |
           ls -al
           ls -al .build
@@ -91,10 +91,20 @@ jobs:
           load: true
           cache-from: type=local,src=.build
           cache-to: type=local,dest=.build-new
+      - name: List2
+        run: |
+          ls -al
+          ls -al .build
+          ls -al .build-new
       - name: Move cache
         run: |
           rm -rf .build
           mv .build-new .build
+          ls -al .build
+      - name: List3
+        run: |
+          ls -al
+          ls -al .build
           
       - name: Log into registry
         # This is where you will update the PATH to GITHUB_TOKEN
