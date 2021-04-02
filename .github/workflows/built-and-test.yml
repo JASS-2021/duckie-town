@@ -50,6 +50,9 @@ jobs:
     env:      
       DOCKER_TARGET_PLATFORM: linux/arm64/v8
   
+    strategy:
+      matrix:
+        arch: ['linux/arm64/v8', 'linux/amd64']
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -67,9 +70,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: .build
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          key: ${{ runner.os }}-${{ matrix.arch }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-spm-
+            ${{ runner.os }}-${{ matrix.arch }}-spm
         
       - name: Build
         uses: docker/build-push-action@v2
@@ -77,7 +80,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: ./Dockerfile
-          platforms: linux/arm64/v8
+          platforms: ${{ matrix.arch }}
           push: false
           tags: jass-duckie-town-webservice
           labels: "runnumber=${GITHUB_RUN_ID}"
@@ -88,11 +91,7 @@ jobs:
         run: |
           rm -rf .build
           mv .build-new .build
-        
-      #- name: Build image
-      #  run: | 
-      #    VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-      #    [ "$VERSION" == "trunk" ] && docker buildx build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" --platform $DOCKER_TARGET_PLATFORM --load 
+          
       - name: Log into registry
         # This is where you will update the PATH to GITHUB_TOKEN
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
