@@ -33,7 +33,7 @@ struct IntersectionRoad {
     var lampId: String?
 }
 
-enum IntersectionDirection {
+enum IntersectionDirection: String, Codable {
     case north
     case east
     case south
@@ -49,6 +49,32 @@ enum IntersectionDirection {
             return intersection.south
         case .west:
             return intersection.west
+        }
+    }
+    
+    func turned(_ direction: TurnDirection) -> IntersectionDirection {
+        if direction == .right {
+            switch self {
+            case .north:
+                return .west
+            case .east:
+                return .north
+            case .south:
+                return .east
+            case .west:
+                return .south
+            }
+        } else {
+            switch self {
+            case .north:
+                return .east
+            case .east:
+                return .south
+            case .south:
+                return .west
+            case .west:
+                return .north
+            }
         }
     }
     

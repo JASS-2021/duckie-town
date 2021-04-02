@@ -5,10 +5,10 @@
 //  Created by Timor Morrien on 01.04.21.
 //
 
-import Foundation
+import Apodini
 
-struct DuckieBot {
-    var id: Int64
+struct DuckieBot: Codable, Identifiable {
+    var id: String
     var intersectionId: Int64
     var atDirection: IntersectionDirection
 }

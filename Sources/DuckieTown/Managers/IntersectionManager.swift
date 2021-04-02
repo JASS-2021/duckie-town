@@ -33,7 +33,7 @@ class IntersectionManager {
         ]
     }
     
-    func getIntersection(by id: Int64) {
-        
+    func getIntersection(by id: Int64) -> Intersection? {
+        intersections.first { $0.id == id }
     }
 }

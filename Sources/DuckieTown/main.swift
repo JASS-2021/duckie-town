@@ -16,17 +16,26 @@ struct DuckieTownWeb: WebService {
         ExporterConfiguration()
             .exporter(RESTInterfaceExporter.self)
             .exporter(OpenAPIInterfaceExporter.self)
+        
+        DuckieTownConfiguration(logLevel: .info)
     }
+    
+    @PathParameter(identifying: DuckieBot.self) var botId: String
 
     var content: some Component {
         Greeter()
-        Group("instruction") {
-            DuckiebotInstructionHandler()
+        Group{
+            "instruction"
+            $botId
+        } content: {
+            DuckiebotGetInstructionHandler(botId: $botId)
                 .operation(.read)
+            DuckiebotAddInstructionHandler(botId: $botId)
+                .operation(.create)
         }
     }
 }
 
-var duckiebot: DuckieBot = DuckieBot(id: 0, intersectionId: 0, atDirection: .south)
+var duckiebot: DuckieBot = DuckieBot(id: "0", intersectionId: 0, atDirection: .south)
 
 try DuckieTownWeb.main()

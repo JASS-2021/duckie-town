@@ -9,7 +9,7 @@ import Foundation
 
 class DuckiebotManager {
     private(set) var duckiebots: [DuckieBot]
-    var instructionMap: [Int64: [Instruction]]
+    var instructionMap: [String: [Instruction]]
     
     init() {
         self.duckiebots = []
@@ -21,12 +21,32 @@ class DuckiebotManager {
         instructionMap[duckiebot.id] = []
     }
     
+    func getDuckiebot(id: String) -> DuckieBot? {
+        duckiebots.first { $0.id == id }
+    }
+    
+    func save(_ duckiebot: DuckieBot) {
+        if let index = duckiebots.firstIndex(where: { $0.id == duckiebot.id }) {
+            duckiebots[index] = duckiebot
+        } else {
+            duckiebots.append(duckiebot)
+        }
+    }
+    
     func addInstruction(_ instruction: Instruction, to duckiebot: DuckieBot) {
         instructionMap[duckiebot.id]?.append(instruction)
     }
     
-    func getNextInstruction(for duckiebot: DuckieBot) {
-        instructionMap[duckiebot.id]?.first ?? .wait(time: 5)
-        instructionMap[duckiebot.id]?.removeFirst()
+    func getNextInstruction(for duckiebot: DuckieBot) -> Instruction {
+        if var queue = instructionMap[duckiebot.id] {
+            if !queue.isEmpty {
+                let instruction = queue.first
+                queue.removeFirst()
+                instructionMap[duckiebot.id] = queue
+                return instruction ?? .wait(time: 5)
+            }
+        }
+        
+        return .wait(time: 5)
     }
 }
