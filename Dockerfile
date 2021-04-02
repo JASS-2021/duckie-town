@@ -18,4 +18,4 @@ RUN swift build --configuration release
 EXPOSE 8080
 
 # Start the application (Preventing rebuilds)
-CMD swift run --skip-build --skip-update
+CMD swift run --skip-build --skip-update --configuration release
