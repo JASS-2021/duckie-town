@@ -50,6 +50,14 @@ jobs:
     env:      
       DOCKER_TARGET_PLATFORM: linux/arm64/v8
     
+    strategy:
+      matrix:
+        include:
+          - arch: linux/arm64/v8
+            name: arm64
+          - arch: linux/amd64
+            name: amd64
+    
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -81,9 +89,10 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: ./Dockerfile
-          platforms: linux/arm64/v8,linux/amd64
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/jass-duckie-town-webservice:latest
+          platforms: ${{ matrix.arch }}
+          push: false
+          load: true
+          tags: jass-duckie-town-webservice
           labels: "runnumber=${GITHUB_RUN_ID}"
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
@@ -93,21 +102,21 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
         
-      #- name: Push image
-      #  run: |
-      #    IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-      #    # Change all uppercase to lowercase
-      #    IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-      #    # Strip git ref prefix from version
-      #    VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-      #    # Strip "v" prefix from tag name
-      #    [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-      #    # Use Docker `latest` tag convention
-      #    [ "$VERSION" == "trunk" ] && VERSION=latest
-      #    echo IMAGE_ID=$IMAGE_ID
-      #    echo VERSION=$VERSION
-      #    docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-      #    docker push $IMAGE_ID:${{ matrix.arch }}
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "trunk" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:${{ matrix.name }}
+          docker push $IMAGE_ID:${{ matrix.name }}
           
   # DEPLOY
   deploy_to_raspberry:
@@ -123,7 +132,7 @@ jobs:
           command: |
             cd ~/duckie-town 
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin 
-            docker pull ghcr.io/jass-2021/jass-duckie-town-webservice:latest
+            docker pull ghcr.io/jass-2021/jass-duckie-town-webservice:arm64
             docker stop duckie-web
             docker rm duckie-web
             docker run -d --name duckie-web --restart=always -p 8080:8080 ghcr.io/jass-2021/jass-duckie-town-webservice:latest
@@ -168,7 +177,7 @@ jobs:
           command: |
             cd ~/duckie-town 
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin 
-            docker pull ghcr.io/jass-2021/jass-duckie-town-webservice-autolab:latest
+            docker pull ghcr.io/jass-2021/jass-duckie-town-webservice-autolab:amd64
             docker stop duckie-web
             docker rm duckie-web
             docker run -d --name duckie-web --restart=always -p 8080:8080 ghcr.io/jass-2021/jass-duckie-town-webservice-autolab:latest
