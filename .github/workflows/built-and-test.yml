@@ -49,10 +49,6 @@ jobs:
     name: Push Docker image to GitHub Packages
     env:      
       DOCKER_TARGET_PLATFORM: linux/arm64/v8
-  
-    strategy:
-      matrix:
-        arch: ['linux/arm64/v8', 'linux/amd64']
         
     runs-on: ubuntu-latest
     steps:
@@ -71,9 +67,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-${{ matrix.arch }}-spm-${{ hashFiles('**/Package.resolved') }}
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.arch }}-spm
+            ${{ runner.os }}-spm
         
       - name: Build
         uses: docker/build-push-action@v2
@@ -81,10 +77,10 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: ./Dockerfile
-          platforms: ${{ matrix.arch }}
+          platforms: linux/arm64/v8,linux/amd64
           push: false
           tags: jass-duckie-town-webservice
-          labels: "runnumber=${GITHUB_RUN_ID}, arch=${{ matrix.arch }}"
+          labels: "runnumber=${GITHUB_RUN_ID}"
           load: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
@@ -111,7 +107,7 @@ jobs:
           [ "$VERSION" == "trunk" ] && VERSION=latest
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:${{ matrix.arch }}
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:${{ matrix.arch }}
           
   # DEPLOY
@@ -131,7 +127,7 @@ jobs:
             docker pull ghcr.io/jass-2021/jass-duckie-town-webservice:latest
             docker stop duckie-web
             docker rm duckie-web
-            docker run -d --name duckie-web --restart=always -p 8080:8080 ghcr.io/jass-2021/jass-duckie-town-webservice:linux/arm64/v8
+            docker run -d --name duckie-web --restart=always -p 8080:8080 ghcr.io/jass-2021/jass-duckie-town-webservice:latest
           # Hostname or IP address of the server.
           host: 131.159.38.52
           # Username for authentication.
@@ -176,7 +172,7 @@ jobs:
             docker pull ghcr.io/jass-2021/jass-duckie-town-webservice-autolab:latest
             docker stop duckie-web
             docker rm duckie-web
-            docker run -d --name duckie-web --restart=always -p 8080:8080 ghcr.io/jass-2021/jass-duckie-town-webservice-autolab:linux/amd64
+            docker run -d --name duckie-web --restart=always -p 8080:8080 ghcr.io/jass-2021/jass-duckie-town-webservice-autolab:latest
           # Hostname or IP address of the server.
           host: 5.19.248.97
           # Username for authentication.
