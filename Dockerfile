@@ -9,7 +9,6 @@ COPY Sources ./Sources
 COPY Tests ./Tests
 
 RUN ls -al
-RUN ls -al .build
 # Resolve the SPM dependencies
 RUN swift package resolve
 RUN ls -al
