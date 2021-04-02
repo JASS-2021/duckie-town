@@ -44,19 +44,17 @@ jobs:
 
 
   # NEW JOB TO RUN after 'testing'
-  push_to_registry:
+  buildx:
     needs: []#[testing]
-    name: Push Docker image to GitHub Packages
-    env:      
-      DOCKER_TARGET_PLATFORM: linux/arm64/v8
+    name: Build the Docker Images
     
     strategy:
       matrix:
         include:
-          - arch: linux/arm64/v8
-            name: arm64
-          - arch: linux/amd64
-            name: amd64
+          - name: arm64
+            arch: linux/arm64/v8
+          - name: amd64
+            arch: linux/amd64
     
     runs-on: ubuntu-latest
     steps:
@@ -75,9 +73,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          key: ${{ runner.os }}-${{ matrix.name }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-spm
+            ${{ runner.os }}-${{ matrix.name }}-spm
         
       - name: Log into registry
         # This is where you will update the PATH to GITHUB_TOKEN
@@ -120,7 +118,7 @@ jobs:
           
   # DEPLOY
   deploy_to_raspberry:
-    needs: [push_to_registry]
+    needs: [buildx]
     name: Deploy Docker image to the Raspberry
 
     runs-on: ubuntu-latest
