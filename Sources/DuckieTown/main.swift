@@ -25,6 +25,16 @@ struct DuckieTownWeb: WebService {
     var content: some Component {
         Greeter()
         Group{
+            "duckiebot"
+            $botId
+            "position"
+        } content: {
+            DuckiebotGetPositionHandler(botId: $botId)
+                .operation(.read)
+            DuckiebotSetPositionHandler(botId: $botId)
+                .operation(.update)
+        }
+        Group{
             "instruction"
             $botId
         } content: {
@@ -33,9 +43,11 @@ struct DuckieTownWeb: WebService {
             DuckiebotAddInstructionHandler(botId: $botId)
                 .operation(.create)
         }
+        Group("intersection") {
+            GetIntersectionHandler()
+                .operation(.read)
+        }
     }
 }
-
-var duckiebot: DuckieBot = DuckieBot(id: "0", intersectionId: 0, atDirection: .south)
 
 try DuckieTownWeb.main()

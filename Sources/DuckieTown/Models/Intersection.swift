@@ -5,9 +5,9 @@
 //  Created by Timor Morrien on 01.04.21.
 //
 
-import Foundation
+import Apodini
 
-struct Intersection {
+struct Intersection: Content, Decodable, Identifiable {
     var id: Int64
     var north: IntersectionRoad?
     var east: IntersectionRoad?
@@ -27,13 +27,13 @@ struct Intersection {
     }
 }
 
-struct IntersectionRoad {
+struct IntersectionRoad: Content, Decodable {
     var leadsToIntersection: Int64
     var leadsToDirection: IntersectionDirection
     var lampId: String?
 }
 
-enum IntersectionDirection: String, Codable {
+enum IntersectionDirection: String, Content, Decodable {
     case north
     case east
     case south
