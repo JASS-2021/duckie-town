@@ -12,16 +12,8 @@ struct Greeter: Handler {
 }
 
 struct DuckieTownWeb: WebService {
-    var configuration: Configuration {
-        ExporterConfiguration()
-            .exporter(RESTInterfaceExporter.self)
-            .exporter(OpenAPIInterfaceExporter.self)
-        
-        DuckieTownConfiguration(logLevel: .info)
-    }
-    
     @PathParameter(identifying: DuckieBot.self) var botId: String
-
+    
     var content: some Component {
         Greeter()
         Group{
@@ -46,7 +38,19 @@ struct DuckieTownWeb: WebService {
         Group("intersection") {
             GetIntersectionHandler()
                 .operation(.read)
+            GetIntersectionsHandler()
+                .operation(.read)
+            SetIntersectionsHandler()
+                .operation(.update)
         }
+    }
+    
+    var configuration: Configuration {
+        ExporterConfiguration()
+            .exporter(RESTInterfaceExporter.self)
+            .exporter(OpenAPIInterfaceExporter.self)
+        
+        DuckieTownConfiguration(logLevel: .info)
     }
 }
 
