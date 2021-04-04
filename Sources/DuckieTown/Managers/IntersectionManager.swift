@@ -38,7 +38,7 @@ class IntersectionManager {
         print(intersections)
     }
     
-    func getIntersection(by id: Int64) -> Intersection? {
+    func getIntersection(by id: Int) -> Intersection? {
         intersections.first { $0.id == id }
     }
     

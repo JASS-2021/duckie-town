@@ -9,6 +9,6 @@ import Apodini
 
 struct DuckieBot: Content, Identifiable {
     var id: String
-    var intersectionId: Int64
+    var intersectionId: Int
     var atDirection: IntersectionDirection
 }

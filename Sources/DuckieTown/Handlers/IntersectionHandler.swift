@@ -9,7 +9,7 @@ import Apodini
 
 struct GetIntersectionHandler: Handler {
     @Environment(\.intersectionManager) var intersectionManager: IntersectionManager
-    @Parameter(.http(.path)) var intersectionId: Int64
+    @Parameter(.http(.path)) var intersectionId: Int
 
     func handle() throws -> Intersection {
         guard let intersection = intersectionManager.getIntersection(by: intersectionId) else {

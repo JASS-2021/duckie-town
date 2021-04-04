@@ -14,7 +14,7 @@ struct DuckiebotGetInstructionHandler: Handler {
     @Environment(\.intersectionManager) var intersectionManager: IntersectionManager
     @Parameter(.http(.path)) var botId: String
 
-    func handle() throws -> String {
+    func handle() throws -> Instruction {
         guard var duckiebot = duckiebotManager.getDuckiebot(id: botId) else {
             throw ApodiniError(type: .notFound, reason: "Invalid ID", description: "There is no DuckieBot with the given ID in the DuckieTown")
         }
@@ -37,10 +37,10 @@ struct DuckiebotGetInstructionHandler: Handler {
             duckiebot.intersectionId = goToRoad.leadsToIntersection
             duckiebot.atDirection = goToRoad.leadsToDirection
             duckiebotManager.save(duckiebot)
-            return instruction.toString()
+            return instruction
         } else {
             print("Invalid instruction")
-            return Instruction.wait(time: 5).toString()
+            return Instruction.wait(time: 5)
         }
         
     }
@@ -53,7 +53,7 @@ struct DuckiebotAddInstructionHandler: Handler {
     @Parameter(.http(.path)) var botId: String
     @Parameter(.http(.body)) var rawInstruction: String
 
-    func handle() throws -> String {
+    func handle() throws -> Instruction {
         guard let duckiebot = duckiebotManager.getDuckiebot(id: botId) else {
             throw ApodiniError(type: .notFound, reason: "Invalid ID", description: "There is no DuckieBot with the given ID in the DuckieTown")
         }
@@ -73,7 +73,7 @@ struct DuckiebotAddInstructionHandler: Handler {
         
         if let instruction = instruction {
             duckiebotManager.addInstruction(instruction, to: duckiebot)
-            return instruction.toString()
+            return instruction
         } else {
             throw ApodiniError(type: .badInput, reason: "Invalid Instruction", description: "The given instruction is not valid")
         }
@@ -81,7 +81,12 @@ struct DuckiebotAddInstructionHandler: Handler {
 }
 
 
-enum Instruction {
+enum Instruction: Content {
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.toString())
+    }
+    
     case wait(time: Int)
     case turn(direction: TurnDirection)
     case forward

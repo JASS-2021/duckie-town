@@ -8,13 +8,13 @@
 import Apodini
 
 struct Intersection: Content, Decodable, Identifiable {
-    var id: Int64
+    var id: Int
     var north: IntersectionRoad?
     var east: IntersectionRoad?
     var south: IntersectionRoad?
     var west: IntersectionRoad?
     
-    init(id: Int64,
+    init(id: Int,
          north: IntersectionRoad? = nil,
          east: IntersectionRoad? = nil,
          south: IntersectionRoad? = nil,
@@ -28,7 +28,7 @@ struct Intersection: Content, Decodable, Identifiable {
 }
 
 struct IntersectionRoad: Content, Decodable {
-    var leadsToIntersection: Int64
+    var leadsToIntersection: Int
     var leadsToDirection: IntersectionDirection
     var lampId: String?
 }

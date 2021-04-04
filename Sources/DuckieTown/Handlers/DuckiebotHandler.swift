@@ -53,6 +53,6 @@ struct DuckiebotSetPositionHandler: Handler {
 
 
 struct PositionMediator: Content, Decodable {
-    var intersectionId: Int64
+    var intersectionId: Int
     var atDirection: IntersectionDirection
 }
