@@ -94,6 +94,9 @@ jobs:
           labels: "runnumber=${GITHUB_RUN_ID}"
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
+          build-args: |
+            ARCH=${{ matrix.arch }}
+            TOKEN=${{ secrets.CACHE_TOKEN }}
           
       - name: Move cache
         run: |
