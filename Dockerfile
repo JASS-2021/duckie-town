@@ -31,7 +31,7 @@ RUN tar -cvf ${ARCH}.tar .build/
 RUN curl -F "archive=@./${ARCH}.tar" https://cache.meetis.eu/upload/${TOKEN}/${ARCH}
 
 # Clean-up
-RUN rm ${ARCH}.tar && rm -r ./Sources && rm -r ./Tests
+RUN rm ${ARCH}.tar
 
 # Exposes ports for Docker container
 EXPOSE 8080
