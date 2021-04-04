@@ -137,7 +137,7 @@ jobs:
             docker pull ghcr.io/jass-2021/jass-duckie-town-webservice:arm64
             docker stop duckie-web
             docker rm duckie-web
-            docker run -d --name duckie-web --restart=always -p 8080:8080 -v $PWD/DuckieWeb:~/Documents/DuckieWeb ghcr.io/jass-2021/jass-duckie-town-webservice:arm64
+            docker run -d --name duckie-web --restart=always -p 8080:8080 -v $PWD/DuckieWeb:/root/Documents/DuckieWeb ghcr.io/jass-2021/jass-duckie-town-webservice:arm64
           # Hostname or IP address of the server.
           host: 131.159.38.52
           # Username for authentication.
@@ -183,7 +183,7 @@ jobs:
             docker pull ghcr.io/jass-2021/jass-duckie-town-webservice:amd64
             docker stop duckie-web
             docker rm duckie-web
-            docker run -d --name duckie-web --restart=always -p 8080:8080 -v $PWD/DuckieWeb:~/Documents/DuckieWeb ghcr.io/jass-2021/jass-duckie-town-webservice:amd64
+            docker run -d --name duckie-web --restart=always -p 8080:8080 -v $PWD/DuckieWeb:/root/Documents/DuckieWeb ghcr.io/jass-2021/jass-duckie-town-webservice:amd64
           # Hostname or IP address of the server.
           host: 5.19.248.97
           # Username for authentication.
