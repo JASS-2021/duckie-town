@@ -16,15 +16,20 @@ struct DuckieTownWeb: WebService {
     
     var content: some Component {
         Greeter()
-        Group{
-            "duckiebot"
-            $botId
-            "position"
-        } content: {
-            DuckiebotGetPositionHandler(botId: $botId)
+        Group("duckiebot") {
+            AddDuckiebotHandler()
+                .operation(.create)
+            GetAllDuckiebotsHandler()
                 .operation(.read)
-            DuckiebotSetPositionHandler(botId: $botId)
-                .operation(.update)
+            Group{
+                $botId
+                "position"
+            } content: {
+                DuckiebotGetPositionHandler(botId: $botId)
+                    .operation(.read)
+                DuckiebotSetPositionHandler(botId: $botId)
+                    .operation(.update)
+            }
         }
         Group{
             "instruction"

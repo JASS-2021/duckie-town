@@ -23,7 +23,8 @@ public final class DuckieTownConfiguration: Configuration {
         logger.logLevel = logLevel
         
         app.duckiebotManager = DuckiebotManager()
-        app.duckiebotManager.addDuckiebot(DuckieBot(id: "donald", intersectionId: 0, atDirection: .north))
+        app.duckiebotManager.save()
+        //app.duckiebotManager.addDuckiebot(DuckieBot(id: "donald", intersectionId: 0, atDirection: .north))
         app.intersectionManager = IntersectionManager()
         app.intersectionManager.save()
         print(app.intersectionManager.intersections)

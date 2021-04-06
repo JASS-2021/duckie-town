@@ -51,37 +51,37 @@ struct DuckiebotAddInstructionHandler: Handler {
     @Environment(\.duckiebotManager) var duckiebotManager: DuckiebotManager
     @Environment(\.intersectionManager) var intersectionManager: IntersectionManager
     @Parameter(.http(.path)) var botId: String
-    @Parameter(.http(.body)) var rawInstruction: String
+    @Parameter(.http(.body)) var instruction: Instruction
 
     func handle() throws -> Instruction {
         guard let duckiebot = duckiebotManager.getDuckiebot(id: botId) else {
             throw ApodiniError(type: .notFound, reason: "Invalid ID", description: "There is no DuckieBot with the given ID in the DuckieTown")
         }
-        var instruction: Instruction?
         
-        if rawInstruction == "turn left" {
-            instruction = .turn(direction: .left)
-        } else if rawInstruction == "turn right" {
-            instruction = .turn(direction: .right)
-        } else if rawInstruction == "forward" {
-            instruction = .forward
-        } else if rawInstruction == "turnaround" {
-            instruction = .turnaround
-        } else if rawInstruction.hasPrefix("wait ") {
-            instruction = .wait(time: Int(rawInstruction.split(separator: " ")[1]) ?? 1)
-        }
-        
-        if let instruction = instruction {
-            duckiebotManager.addInstruction(instruction, to: duckiebot)
-            return instruction
-        } else {
-            throw ApodiniError(type: .badInput, reason: "Invalid Instruction", description: "The given instruction is not valid")
-        }
+        duckiebotManager.addInstruction(instruction, to: duckiebot)
+        return instruction
     }
 }
 
 
-enum Instruction: Content {
+enum Instruction: Content, Decodable {
+    init(from decoder: Decoder) throws {
+        var rawInstruction = try decoder.singleValueContainer().decode(String.self)
+        if rawInstruction == "turn left" {
+            self = .turn(direction: .left)
+        } else if rawInstruction == "turn right" {
+            self = .turn(direction: .right)
+        } else if rawInstruction == "forward" {
+            self = .forward
+        } else if rawInstruction == "turnaround" {
+            self = .turnaround
+        } else if rawInstruction.hasPrefix("wait ") {
+            self = .wait(time: Int(rawInstruction.split(separator: " ")[1]) ?? 1)
+        } else {
+            throw ApodiniError(type: .badInput, reason: "Invalid Instruction", description: "The given instruction is not valid")
+        }
+    }
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.toString())

@@ -12,13 +12,19 @@ class DuckiebotManager {
     var instructionMap: [String: [Instruction]]
     
     init() {
-        self.duckiebots = []
-        self.instructionMap = [:]
+        self.duckiebots = (try? FileIOController.read(fromDocumentNamed: "duckiebots.json")) ?? []
+        self.instructionMap = (try? FileIOController.read(fromDocumentNamed: "instructionMap.json")) ?? [:]
+    }
+    
+    func save() {
+        try? FileIOController.write(duckiebots, toDocumentNamed: "duckiebots.json")
+        try? FileIOController.write(instructionMap, toDocumentNamed: "instructionMap.json")
     }
     
     func addDuckiebot(_ duckiebot: DuckieBot) {
         duckiebots.append(duckiebot)
         instructionMap[duckiebot.id] = []
+        save()
     }
     
     func getDuckiebot(id: String) -> DuckieBot? {
@@ -31,10 +37,12 @@ class DuckiebotManager {
         } else {
             duckiebots.append(duckiebot)
         }
+        save()
     }
     
     func addInstruction(_ instruction: Instruction, to duckiebot: DuckieBot) {
         instructionMap[duckiebot.id]?.append(instruction)
+        save()
     }
     
     func getNextInstruction(for duckiebot: DuckieBot) -> Instruction {
@@ -46,6 +54,7 @@ class DuckiebotManager {
                 return instruction ?? .wait(time: 5)
             }
         }
+        save()
         
         return .wait(time: 5)
     }

@@ -9,6 +9,27 @@ import Foundation
 import Apodini
 import ApodiniREST
 
+struct AddDuckiebotHandler: Handler {
+    @Environment(\.duckiebotManager) var duckiebotManager: DuckiebotManager
+    
+    @Parameter(.http(.body)) var duckiebot: DuckieBot
+
+    func handle() throws -> DuckieBot {
+        duckiebotManager.addDuckiebot(duckiebot)
+        return duckiebot
+    }
+}
+
+
+struct GetAllDuckiebotsHandler: Handler {
+    @Environment(\.duckiebotManager) var duckiebotManager: DuckiebotManager
+
+    func handle() throws -> [DuckieBot] {
+        return duckiebotManager.duckiebots
+    }
+}
+
+
 struct DuckiebotGetPositionHandler: Handler {
     @Environment(\.duckiebotManager) var duckiebotManager: DuckiebotManager
     

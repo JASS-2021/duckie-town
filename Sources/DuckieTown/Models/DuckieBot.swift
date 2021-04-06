@@ -7,7 +7,7 @@
 
 import Apodini
 
-struct DuckieBot: Content, Identifiable {
+struct DuckieBot: Content, Decodable, Identifiable {
     var id: String
     var intersectionId: Int
     var atDirection: IntersectionDirection
